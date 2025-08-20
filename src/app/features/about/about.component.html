@@ -1,0 +1,37 @@
+<div class="about-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6 d-flex justify-content-center">
+                <img src="/assets/img/avatar.PNG" alt="Phạm Hoàng Dinh" class="avatar animate-on-scroll slide-left">
+            </div>
+            <div class="col-md-6 text-md-start text-center mt-4 mt-md-0">
+                <h1 class="animate-on-scroll slide-right delay-1" style="font-size: 3.5rem; font-weight: bold; line-height: 1.1; letter-spacing: -2px;">
+                    <span [innerHTML]="displayedText"></span>
+                </h1>
+                <p class="animate-on-scroll slide-right delay-2" style="font-size: 1.2rem; color: #ccc; max-width: 500px; margin: 24px 0 32px 0;">
+                    A Ho Chi Minh City based software engineering student passionate about building real-world applications, mastering Java/OOP, and collaborating in Agile teams to create user-friendly solutions.
+                </p>
+                <div class="d-flex flex-wrap gap-3 justify-content-md-start justify-content-center animate-on-scroll delay-3">
+                    <a href="mailto:pdinh460@gmail.com" class="btn">CONTACT</a>
+                    <a href="/assets/certificates/cv.pdf" target="_blank" class="btn">RESUME</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer above scroll section -->
+<div class="page-footer">
+    <p>&copy; {{ currentYear }} Copyright Dinh Pham. All rights reserved.</p>
+</div>
+
+<!-- Scroll section -->
+<div class="scroll-section">
+    <div class="scroll-content">
+        <h2>Scroll down to view {{ nextPageName }}</h2>
+        <p>Continue scrolling to automatically switch to the {{ nextPageName }} page</p>
+        <div class="scroll-arrow">
+            <i class="fas fa-arrow-down"></i>
+        </div>
+    </div>
+</div>

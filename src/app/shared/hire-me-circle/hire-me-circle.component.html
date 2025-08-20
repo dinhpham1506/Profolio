@@ -1,0 +1,34 @@
+<div class="hire-me-circle" [class.expanded]="isExpanded">
+  <!-- Main Hire Me Button -->
+  <div class="main-circle" (click)="toggleMenu()">
+    <i class="fas fa-briefcase" *ngIf="!isExpanded"></i>
+    <i class="fas fa-times" *ngIf="isExpanded"></i>
+    <div class="circular-text" *ngIf="!isExpanded">
+      <svg viewBox="0 0 100 100" class="circular-svg">
+        <defs>
+          <path id="circle-path" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0"/>
+        </defs>
+        <text class="curved-text">
+          <textPath href="#circle-path" startOffset="0%">
+            backend developer
+          </textPath>
+        </text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Expanded Menu Options -->
+  <div class="menu-options" *ngIf="isExpanded">
+    <!-- Contact Button -->
+    <div class="option-circle contact-option" (click)="navigateToContact()" title="Contact Me">
+      <i class="fas fa-envelope"></i>
+      <span class="option-text">Contact</span>
+    </div>
+
+    <!-- Download CV Button -->
+    <div class="option-circle cv-option" (click)="downloadCV()" title="Download CV">
+      <i class="fas fa-download"></i>
+      <span class="option-text">CV</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,21 @@
+<div class="app-container">
+  <!-- Horizontal Navbar -->
+  <nav>
+    <div class="navbar-brand" routerLink="/about" (click)="onNavbarClick()">Dinh Pham</div>
+    <div class="navbar-links">
+      <a routerLink="/about" routerLinkActive="active" (click)="onNavbarClick()">About</a>
+      <a routerLink="/resume" routerLinkActive="active" (click)="onNavbarClick()">Resume</a>
+      <a routerLink="/portfolio" routerLinkActive="active" (click)="onNavbarClick()">Portfolio</a>
+      <a routerLink="/contact" routerLinkActive="active" (click)="onNavbarClick()">Contact</a>
+    </div>
+  </nav>
+  
+  <!-- Main Content -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>
+
+<!-- Floating Hire Me Circle -->
+<app-hire-me-circle></app-hire-me-circle>
