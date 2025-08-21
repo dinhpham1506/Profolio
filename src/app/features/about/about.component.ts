@@ -14,18 +14,25 @@ import { NavigationService } from '../../shared/navigation.service';
 export class AboutComponent implements OnInit, OnDestroy, AfterViewInit {
   currentYear = new Date().getFullYear();
   nextPageName = 'Resume';
-  private scrollThreshold = 200; // Reduced threshold for better responsiveness
   private hasNavigated = false;
   private isBrowser: boolean;
   private allowScrollNavigation = false;
   private navigationTimeout: any;
   private lastScrollTop = 0;
+  private config: any;
 
   // Typewriter effect - PHẢI PUBLIC để dùng trong template
   typewriterText: string = 'HI, I AM<br>DINH.';
   displayedText: string = '';
   private typewriterIndex = 0;
   private typewriterTimeout: any;
+
+  // Paragraph typewriter
+  paragraphText: string = 'A Ho Chi Minh City based software engineering student passionate about building real-world applications, mastering Java/OOP, and collaborating in Agile teams to create user-friendly solutions.';
+  displayedParagraph: string = '';
+  paragraphIndex = 0; // Made public for template
+  paragraphTypingComplete = false; // Track completion
+  private paragraphTimeout: any;
 
   constructor(
     private router: Router,
@@ -49,18 +56,50 @@ export class AboutComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.typewriterIndex <= this.typewriterText.length) {
       this.displayedText = this.typewriterText.slice(0, this.typewriterIndex);
       this.typewriterIndex++;
-      this.typewriterTimeout = setTimeout(() => this.typeChar(), 50); // Thay đổi từ 90ms thành 50ms để nhanh hơn
+      
+      if (this.typewriterIndex <= this.typewriterText.length) {
+        this.typewriterTimeout = setTimeout(() => this.typeChar(), 50);
+      } else {
+        // H1 typing is complete, start paragraph typing immediately
+        setTimeout(() => {
+          this.startParagraphTyping();
+        }, 500); // Start paragraph typing quickly
+      }
+    }
+  }
+
+  private startParagraphTyping() {
+    this.displayedParagraph = '';
+    this.paragraphIndex = 0;
+    this.paragraphTypingComplete = false;
+    if (this.paragraphTimeout) {
+      clearTimeout(this.paragraphTimeout);
+    }
+    this.typeParagraphChar();
+  }
+
+  private typeParagraphChar() {
+    if (this.paragraphIndex < this.paragraphText.length) {
+      this.displayedParagraph = this.paragraphText.slice(0, this.paragraphIndex + 1);
+      this.paragraphIndex++;
+      this.paragraphTimeout = setTimeout(() => this.typeParagraphChar(), 30);
+    } else {
+      // Typing complete, hide cursor after a delay
+      setTimeout(() => {
+        this.paragraphTypingComplete = true;
+      }, 1000);
     }
   }
 
   ngOnInit() {
+    this.config = this.navigationService.getNavigationConfig();
     this.hasNavigated = false;
     this.allowScrollNavigation = false;
     
-    // Allow scroll navigation after 1 second to prevent immediate navigation
+    // Allow scroll navigation after configured delay to prevent immediate navigation
     this.navigationTimeout = setTimeout(() => {
       this.allowScrollNavigation = true;
-    }, 1000);
+    }, this.config.navigationDelay);
     
     // Listen to route changes to reset navigation flag
     if (this.isBrowser) {
@@ -74,7 +113,7 @@ export class AboutComponent implements OnInit, OnDestroy, AfterViewInit {
           clearTimeout(this.navigationTimeout);
           this.navigationTimeout = setTimeout(() => {
             this.allowScrollNavigation = true;
-          }, 1000);
+          }, this.config.navigationDelay);
           
           // Trigger animations when navigating to about page
           this.triggerAnimations();
@@ -112,6 +151,19 @@ export class AboutComponent implements OnInit, OnDestroy, AfterViewInit {
           element.classList.add('visible');
         }
       });
+
+      // Trigger typing reveal for paragraph after H1 completes
+      setTimeout(() => {
+        const typingElement = document.querySelector('.typing-reveal');
+        if (typingElement) {
+          typingElement.classList.add('active');
+          
+          // Remove typing cursor after animation completes
+          setTimeout(() => {
+            typingElement.classList.add('complete');
+          }, 4500);
+        }
+      }, 2000); // Wait for H1 typing to complete
     }, 200);
   }
 
@@ -146,48 +198,62 @@ export class AboutComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.typewriterTimeout) {
       clearTimeout(this.typewriterTimeout);
     }
+    if (this.paragraphTimeout) {
+      clearTimeout(this.paragraphTimeout);
+    }
   }
 
   @HostListener('window:scroll', ['$event'])
   onWindowScroll() {
-    if (!this.isBrowser || this.hasNavigated || !this.allowScrollNavigation) return;
-    
-    // Check if scroll navigation is enabled
-    if (!this.navigationService.isScrollNavigationEnabled()) return;
+    if (!this.isBrowser) return;
     
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const documentHeight = document.documentElement.scrollHeight;
     const windowHeight = window.innerHeight;
-    const distanceFromBottom = documentHeight - (scrollTop + windowHeight);
     
-    // Debug logging
-    console.log('About scroll:', {
-      scrollTop,
-      lastScrollTop: this.lastScrollTop,
-      threshold: this.scrollThreshold,
-      allowNavigation: this.allowScrollNavigation,
-      hasNavigated: this.hasNavigated,
-      distanceFromBottom,
-      scrollDirection: scrollTop > this.lastScrollTop ? 'down' : 'up'
-    });
+    // Debug logging removed for production
     
     // Navigate to contact when scrolling up from top (reverse navigation)
-    if (scrollTop <= this.scrollThreshold && scrollTop < this.lastScrollTop && this.lastScrollTop > 400) {
-      console.log('Navigating to contact from about');
+    if (this.navigationService.shouldNavigate(
+      scrollTop, 
+      this.lastScrollTop, 
+      this.allowScrollNavigation, 
+      this.hasNavigated, 
+      true
+    )) {
       this.hasNavigated = true;
-      this.router.navigate(['/contact']).then(() => {
-        // Scroll to bottom of contact page to maintain flow
-        setTimeout(() => {
-          window.scrollTo(0, document.documentElement.scrollHeight);
-        }, 100);
+      this.navigationService.setManualNavigationInProgress(true);
+      this.router.navigate(['/contact']).then((success) => {
+        if (success) {
+          // Scroll to bottom of contact page to maintain flow
+          setTimeout(() => {
+            window.scrollTo(0, document.documentElement.scrollHeight);
+          }, 100);
+        }
+      }).catch((error) => {
+        this.hasNavigated = false;
       });
     }
     // Navigate to resume when scrolling down to bottom
-    else if (distanceFromBottom <= this.scrollThreshold && scrollTop > this.lastScrollTop) {
-      console.log('Navigating to resume from about');
+    else if (this.navigationService.shouldNavigate(
+      scrollTop, 
+      this.lastScrollTop, 
+      this.allowScrollNavigation, 
+      this.hasNavigated, 
+      false,
+      documentHeight,
+      windowHeight
+    )) {
       this.hasNavigated = true;
-      this.router.navigate(['/resume']).then(() => {
-        window.scrollTo(0, 0);
+      this.navigationService.setManualNavigationInProgress(true);
+      this.router.navigate(['/resume']).then((success) => {
+        if (success) {
+          setTimeout(() => {
+            window.scrollTo(0, 0);
+          }, 50);
+        }
+      }).catch((error) => {
+        this.hasNavigated = false;
       });
     }
     

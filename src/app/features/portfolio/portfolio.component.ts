@@ -33,12 +33,12 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
   nextPageName = 'Contact';
   isModalOpen = false;
   selectedProject: Project | null = null;
-  private scrollThreshold = 100; // Increased threshold to give users more time to view projects
   allowScrollNavigation = false; // Made public for template access
   private navigationTimeout: any;
   private hasNavigated = false;
   private isBrowser: boolean;
   private lastScrollTop = 0;
+  private config: any;
 
   projects: { [key: string]: Project } = {
     foodshare: {
@@ -62,8 +62,7 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
         { name: 'OpenAI', icon: 'https://img.icons8.com/color/48/chatgpt.png' },
         { name: 'Google Maps', icon: 'https://img.icons8.com/color/48/google-maps.png' }
       ],
-      liveUrl: 'https://foodshare-app.vercel.app',
-      githubUrl: 'https://github.com/dinhpham1506/foodshare'
+      liveUrl: 'https://food-share-fe.vercel.app/'
     },
     reprotrack: {
       id: 'reprotrack',
@@ -86,8 +85,7 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
         { name: 'OAuth2', icon: 'https://img.icons8.com/color/48/security-checked.png' },
         { name: 'AI Chatbot', icon: 'https://img.icons8.com/color/48/chatgpt.png' }
       ],
-      liveUrl: 'https://reprotrack-demo.vercel.app',
-      githubUrl: 'https://github.com/dinhpham1506/reprotrack'
+      liveUrl: 'https://reprotrack.vercel.app/'
     }
   };
 
@@ -100,13 +98,14 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.config = this.navigationService.getNavigationConfig();
     this.hasNavigated = false;
     this.allowScrollNavigation = false;
     
-    // Allow scroll navigation after 3 seconds to give users time to view projects
+    // Allow scroll navigation after configured delay to give users time to view projects
     this.navigationTimeout = setTimeout(() => {
       this.allowScrollNavigation = true;
-    }, 3000);
+    }, this.config.navigationDelay);
   }
 
   ngAfterViewInit(): void {
@@ -125,17 +124,20 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @HostListener('window:scroll', ['$event'])
   onWindowScroll() {
-    if (!this.isBrowser || this.hasNavigated || !this.allowScrollNavigation) return;
-    
-    // Check if scroll navigation is enabled
-    if (!this.navigationService.isScrollNavigationEnabled()) return;
+    if (!this.isBrowser) return;
     
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const documentHeight = document.documentElement.scrollHeight;
     const windowHeight = window.innerHeight;
     
     // Navigate to Resume when scrolling up near the top
-    if (scrollTop <= this.scrollThreshold && scrollTop < this.lastScrollTop && this.lastScrollTop > 200) {
+    if (this.navigationService.shouldNavigate(
+      scrollTop, 
+      this.lastScrollTop, 
+      this.allowScrollNavigation, 
+      this.hasNavigated, 
+      true
+    )) {
       this.hasNavigated = true;
       this.router.navigate(['/resume']).then(() => {
         // Scroll to bottom of resume page to maintain flow
@@ -145,7 +147,15 @@ export class PortfolioComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     }
     // Navigate to Contact when scrolling down near the bottom
-    else if (scrollTop + windowHeight >= documentHeight - this.scrollThreshold && scrollTop > this.lastScrollTop) {
+    else if (this.navigationService.shouldNavigate(
+      scrollTop, 
+      this.lastScrollTop, 
+      this.allowScrollNavigation, 
+      this.hasNavigated, 
+      false,
+      documentHeight,
+      windowHeight
+    )) {
       this.hasNavigated = true;
       this.router.navigate(['/contact']).then(() => {
         window.scrollTo(0, 0);

@@ -1,16 +1,23 @@
-<div class="hire-me-circle" [class.expanded]="isExpanded">
+<div class="hire-me-circle" [class.expanded]="isExpanded" [class.animating]="isAnimating">
   <!-- Main Hire Me Button -->
-  <div class="main-circle" (click)="toggleMenu()">
-    <i class="fas fa-briefcase" *ngIf="!isExpanded"></i>
-    <i class="fas fa-times" *ngIf="isExpanded"></i>
-    <div class="circular-text" *ngIf="!isExpanded">
+  <div class="main-circle" 
+       (click)="toggleMenu()" 
+       [attr.aria-label]="isExpanded ? 'Close hire me menu' : 'Open hire me menu'"
+       [attr.aria-expanded]="isExpanded"
+       role="button"
+       tabindex="0"
+       (keydown.enter)="toggleMenu()"
+       (keydown.space)="toggleMenu()">
+    <i class="fas fa-briefcase" *ngIf="!isExpanded" aria-hidden="true"></i>
+    <i class="fas fa-times" *ngIf="isExpanded" aria-hidden="true"></i>
+    <div class="circular-text" *ngIf="!isExpanded" aria-hidden="true">
       <svg viewBox="0 0 100 100" class="circular-svg">
         <defs>
           <path id="circle-path" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0"/>
         </defs>
-        <text class="curved-text">
+        <text class="curved-text rotating-text">
           <textPath href="#circle-path" startOffset="0%">
-            backend developer
+            HIRE ME HIRE ME HIRE ME HIRE ME HIRE ME HIRE ME
           </textPath>
         </text>
       </svg>
@@ -18,16 +25,30 @@
   </div>
 
   <!-- Expanded Menu Options -->
-  <div class="menu-options" *ngIf="isExpanded">
+  <div class="menu-options" *ngIf="isExpanded" role="menu" aria-label="Hire me options">
     <!-- Contact Button -->
-    <div class="option-circle contact-option" (click)="navigateToContact()" title="Contact Me">
-      <i class="fas fa-envelope"></i>
+    <div class="option-circle contact-option" 
+         (click)="navigateToContact()" 
+         (keydown.enter)="navigateToContact()"
+         (keydown.space)="navigateToContact()"
+         title="Contact Me"
+         role="menuitem"
+         tabindex="0"
+         aria-label="Navigate to contact page">
+      <i class="fas fa-envelope" aria-hidden="true"></i>
       <span class="option-text">Contact</span>
     </div>
 
     <!-- Download CV Button -->
-    <div class="option-circle cv-option" (click)="downloadCV()" title="Download CV">
-      <i class="fas fa-download"></i>
+    <div class="option-circle cv-option" 
+         (click)="downloadCV()" 
+         (keydown.enter)="downloadCV()"
+         (keydown.space)="downloadCV()"
+         title="Download CV"
+         role="menuitem"
+         tabindex="0"
+         aria-label="Download CV PDF">
+      <i class="fas fa-download" aria-hidden="true"></i>
       <span class="option-text">CV</span>
     </div>
   </div>

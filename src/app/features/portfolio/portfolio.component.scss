@@ -366,6 +366,130 @@
   opacity: 1;
 }
 
+// Live Demo Button - Consistent with About page style
+.live-demo-btn {
+  background: #2196f3;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 2rem;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: none;
+  box-shadow: 
+    0 8px 25px rgba(33, 150, 243, 0.3),
+    0 0 0 0 rgba(33, 150, 243, 0.7);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  animation: pulse-ring 2s infinite;
+
+  // Particle effect
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, transparent 70%);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    opacity: 0;
+  }
+
+  // Lightning effect
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(255, 255, 255, 0.4), 
+      rgba(255, 255, 255, 0.6), 
+      rgba(255, 255, 255, 0.4), 
+      transparent
+    );
+    transform: skewX(-25deg);
+    transition: left 0.7s;
+  }
+
+  svg {
+    transition: all 0.3s ease;
+  }
+
+  &:hover {
+    background: #1976d2;
+    transform: translateY(-8px) scale(1.1) rotate(1deg);
+    box-shadow: 
+      0 15px 40px rgba(33, 150, 243, 0.5),
+      0 0 0 10px rgba(33, 150, 243, 0.1),
+      0 0 0 20px rgba(33, 150, 243, 0.05);
+    animation: shake 0.5s ease-in-out;
+
+    &::before {
+      width: 200px;
+      height: 200px;
+      opacity: 1;
+    }
+
+    &::after {
+      left: 100%;
+    }
+
+    svg {
+      transform: scale(1.2) rotate(5deg);
+    }
+  }
+
+  &:active {
+    transform: translateY(-4px) scale(1.05);
+    animation: explode 0.3s ease;
+  }
+}
+
+// Pulse ring animation
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 
+      0 8px 25px rgba(33, 150, 243, 0.3),
+      0 0 0 0 rgba(33, 150, 243, 0.7);
+  }
+  70% {
+    box-shadow: 
+      0 8px 25px rgba(33, 150, 243, 0.3),
+      0 0 0 15px rgba(33, 150, 243, 0);
+  }
+  100% {
+    box-shadow: 
+      0 8px 25px rgba(33, 150, 243, 0.3),
+      0 0 0 0 rgba(33, 150, 243, 0);
+  }
+}
+
+// Shake animation on hover
+@keyframes shake {
+  0%, 100% { transform: translateY(-8px) scale(1.1) rotate(1deg); }
+  25% { transform: translateY(-8px) scale(1.1) rotate(-1deg); }
+  75% { transform: translateY(-8px) scale(1.1) rotate(0.5deg); }
+}
+
+// Explode animation on click
+@keyframes explode {
+  0% { transform: translateY(-4px) scale(1.05); }
+  50% { transform: translateY(-4px) scale(1.2); }
+  100% { transform: translateY(-4px) scale(1.05); }
+}
+
 // Project Modal
 .project-modal {
   position: fixed;
@@ -445,16 +569,107 @@
           gap: 20px;
         }
         
-        .project-main-image {
+        .project-main-image-container {
+          position: relative;
           width: 300px;
           height: 200px;
-          object-fit: cover;
           border-radius: 15px;
+          overflow: hidden;
           box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
           
           @media (max-width: 768px) {
             width: 100%;
             height: 250px;
+          }
+          
+          .project-main-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+          }
+          
+          .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            
+            .image-links {
+              display: flex;
+              gap: 15px;
+              flex-direction: column;
+              align-items: center;
+              
+              @media (max-width: 768px) {
+                flex-direction: row;
+                gap: 10px;
+              }
+            }
+            
+            .image-link-btn {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              padding: 12px 20px;
+              background: rgba(37, 99, 235, 0.9);
+              color: white;
+              border: none;
+              border-radius: 25px;
+              font-size: 0.9rem;
+              font-weight: 600;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              backdrop-filter: blur(10px);
+              border: 1px solid rgba(255, 255, 255, 0.2);
+              
+              &:hover {
+                background: rgba(37, 99, 235, 1);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+              }
+              
+              svg {
+                width: 18px;
+                height: 18px;
+              }
+              
+              span {
+                font-size: 0.85rem;
+                
+                @media (max-width: 768px) {
+                  display: none;
+                }
+              }
+              
+              @media (max-width: 768px) {
+                padding: 10px;
+                border-radius: 50%;
+                
+                svg {
+                  width: 20px;
+                  height: 20px;
+                }
+              }
+            }
+          }
+          
+          &:hover {
+            .project-main-image {
+              transform: scale(1.05);
+            }
+            
+            .image-overlay {
+              opacity: 1;
+            }
           }
         }
         

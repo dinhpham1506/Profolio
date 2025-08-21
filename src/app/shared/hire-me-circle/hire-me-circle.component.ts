@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 export class HireMeCircleComponent implements OnInit {
   isExpanded = false;
   private isBrowser: boolean;
+  isAnimating = false;
 
   constructor(
     private router: Router,
@@ -33,22 +34,50 @@ export class HireMeCircleComponent implements OnInit {
   }
 
   toggleMenu() {
+    if (this.isAnimating) return;
+    
+    this.isAnimating = true;
     this.isExpanded = !this.isExpanded;
+    
+    // Reset animation flag after animation completes
+    setTimeout(() => {
+      this.isAnimating = false;
+    }, 400);
   }
 
   navigateToContact() {
-    this.router.navigate(['/contact']);
+    if (this.isAnimating) return;
+    
+    this.isAnimating = true;
     this.isExpanded = false;
+    
+    // Navigate after animation
+    setTimeout(() => {
+      this.router.navigate(['/contact']);
+      this.isAnimating = false;
+    }, 300);
   }
 
   downloadCV() {
-    if (this.isBrowser) {
-      const link = document.createElement('a');
-      link.href = '/assets/cv.pdf';
-      link.download = 'Dinh_Pham_CV.pdf';
-      link.click();
-    }
+    if (this.isAnimating || !this.isBrowser) return;
+    
+    this.isAnimating = true;
     this.isExpanded = false;
+    
+    // Download after animation
+    setTimeout(() => {
+      try {
+        const link = document.createElement('a');
+        link.href = '/assets/certificates/cv.pdf'; // Updated path
+        link.download = 'Dinh_Pham_CV.pdf';
+        link.click();
+      } catch (error) {
+        console.error('Error downloading CV:', error);
+        // Fallback: open in new tab
+        window.open('/assets/certificates/cv.pdf', '_blank');
+      }
+      this.isAnimating = false;
+    }, 300);
   }
 
   @HostListener('document:keydown.escape', ['$event'])

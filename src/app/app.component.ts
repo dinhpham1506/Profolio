@@ -1,14 +1,14 @@
 import { Component, OnInit, HostListener, ElementRef, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { HireMeCircleComponent } from './shared/hire-me-circle/hire-me-circle.component';
 import { NavigationService } from './shared/navigation.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, HireMeCircleComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive, HireMeCircleComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -18,6 +18,9 @@ export class AppComponent implements OnInit, AfterViewInit {
   private lastScrollTop = 0;
   private navbarElement: HTMLElement | null = null;
   private isBrowser: boolean;
+  isMobileMenuOpen = false;
+  currentPageTitle = 'Dinh Pham';
+  isScrolled = false;
 
   constructor(
     private elementRef: ElementRef, 
@@ -36,8 +39,9 @@ export class AppComponent implements OnInit, AfterViewInit {
       // Listen to route changes
       this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
-      ).subscribe(() => {
+      ).subscribe((event: NavigationEnd) => {
         this.updateProgressLine();
+        this.updatePageTitle(event.url);
       });
     }
   }
@@ -45,6 +49,7 @@ export class AppComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     if (this.isBrowser) {
       this.updateProgressLine();
+      this.updatePageTitle(this.router.url);
     }
   }
 
@@ -53,6 +58,9 @@ export class AppComponent implements OnInit, AfterViewInit {
     if (!this.isBrowser) return;
     
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    // Update scroll state
+    this.isScrolled = scrollTop > 100;
     
     // Navbar scroll effects
     if (this.navbarElement) {
@@ -72,6 +80,16 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     this.lastScrollTop = scrollTop;
     this.animateOnScroll();
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onWindowResize() {
+    if (!this.isBrowser) return;
+    
+    // Close mobile menu when resizing to desktop
+    if (window.innerWidth > 768 && this.isMobileMenuOpen) {
+      this.closeMobileMenu();
+    }
   }
 
   private setupScrollAnimations() {
@@ -101,6 +119,30 @@ export class AppComponent implements OnInit, AfterViewInit {
   onNavbarClick() {
     // Notify navigation service that manual navigation is in progress
     this.navigationService.setManualNavigationInProgress(true);
+    // Close mobile menu when a link is clicked
+    this.closeMobileMenu();
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    
+    // Prevent body scroll when menu is open
+    if (this.isBrowser) {
+      if (this.isMobileMenuOpen) {
+        document.body.classList.add('mobile-menu-open');
+      } else {
+        document.body.classList.remove('mobile-menu-open');
+      }
+    }
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+    
+    // Restore body scroll
+    if (this.isBrowser) {
+      document.body.classList.remove('mobile-menu-open');
+    }
   }
 
   private updateProgressLine() {
@@ -121,4 +163,25 @@ export class AppComponent implements OnInit, AfterViewInit {
       }
     }, 100);
   }
+
+  private updatePageTitle(url: string) {
+    // Map routes to page titles
+    const routeTitleMap: { [key: string]: string } = {
+      '/about': 'About',
+      '/resume': 'Resume', 
+      '/portfolio': 'Portfolio',
+      '/contact': 'Contact'
+    };
+
+    // Get the current route
+    const currentRoute = url.split('?')[0]; // Remove query params if any
+    
+    // Update the page title based on route
+    if (routeTitleMap[currentRoute]) {
+      this.currentPageTitle = routeTitleMap[currentRoute];
+    } else {
+      this.currentPageTitle = 'Dinh Pham'; // Default fallback
+    }
+  }
+
 }

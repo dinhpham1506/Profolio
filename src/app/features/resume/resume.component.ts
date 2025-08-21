@@ -12,11 +12,11 @@ import { NavigationService } from '../../shared/navigation.service';
 })
 export class ResumeComponent implements OnInit, AfterViewInit, OnDestroy {
   showModal = false;
-  private scrollThreshold = 100; // Scroll 100px để chuyển trang
   private hasNavigated = false;
   private isBrowser: boolean;
   private lastScrollTop = 0;
   allowNavigation = false; // Made public for template access
+  private config: any;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -27,12 +27,13 @@ export class ResumeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.config = this.navigationService.getNavigationConfig();
     this.hasNavigated = false;
     this.allowNavigation = false;
-    // Delay để cho phép navigation sau 1 giây để tránh navigation ngay lập tức
+    // Delay để cho phép navigation sau configured delay để tránh navigation ngay lập tức
     setTimeout(() => {
       this.allowNavigation = true;
-    }, 1000);
+    }, this.config.navigationDelay);
   }
 
   ngOnDestroy(): void {
@@ -41,25 +42,35 @@ export class ResumeComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @HostListener('window:scroll', ['$event'])
   onWindowScroll() {
-    if (!this.isBrowser || this.hasNavigated || !this.allowNavigation) return;
-    
-    // Check if scroll navigation is enabled
-    if (!this.navigationService.isScrollNavigationEnabled()) return;
+    if (!this.isBrowser) return;
     
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     const documentHeight = document.documentElement.scrollHeight;
     const windowHeight = window.innerHeight;
-    const distanceFromBottom = documentHeight - (scrollTop + windowHeight);
     
-    // Nếu scroll về đầu trang thì chuyển về about (chỉ khi scroll lên từ vị trí cao và đã ở trên trang một lúc)
-    if (scrollTop <= this.scrollThreshold && scrollTop < this.lastScrollTop && this.lastScrollTop > 200) {
+    // Nếu scroll về đầu trang thì chuyển về about
+    if (this.navigationService.shouldNavigate(
+      scrollTop, 
+      this.lastScrollTop, 
+      this.allowNavigation, 
+      this.hasNavigated, 
+      true
+    )) {
       this.hasNavigated = true;
       this.router.navigate(['/about']).then(() => {
         window.scrollTo(0, 0);
       });
     }
     // Nếu scroll gần đến cuối trang thì chuyển sang portfolio
-    else if (distanceFromBottom <= this.scrollThreshold) {
+    else if (this.navigationService.shouldNavigate(
+      scrollTop, 
+      this.lastScrollTop, 
+      this.allowNavigation, 
+      this.hasNavigated, 
+      false,
+      documentHeight,
+      windowHeight
+    )) {
       this.hasNavigated = true;
       this.router.navigate(['/portfolio']).then(() => {
         window.scrollTo(0, 0);

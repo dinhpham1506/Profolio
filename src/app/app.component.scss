@@ -1,4 +1,4 @@
-// Horizontal Navbar
+// Responsive Navbar
 nav {
   background: #111;
   color: white;
@@ -17,6 +17,39 @@ nav {
   z-index: 1000;
   transition: all 0.3s ease;
 
+  // Scrolled state - more compact navbar
+  &.scrolled {
+    padding: 12px 30px;
+    background: rgba(17, 17, 17, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+
+    .navbar-brand {
+      font-size: 20px;
+    }
+
+    @media (max-width: 768px) {
+      padding: 8px 20px;
+      
+      .navbar-brand {
+        font-size: 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      padding: 6px 15px;
+      
+      .navbar-brand {
+        font-size: 16px;
+      }
+    }
+  }
+
+  // Hidden state - navbar slides up when scrolling down
+  &.hidden {
+    transform: translateY(-100%);
+  }
+
   // Brand name styling
   .navbar-brand {
     font-size: 24px;
@@ -26,9 +59,72 @@ nav {
     cursor: pointer;
     transition: color 0.3s ease;
     font-family: 'Poppins', sans-serif;
+    z-index: 1001;
+    position: relative;
 
     &:hover {
       color: #2196f3;
+    }
+
+    .brand-name {
+      display: inline-block;
+      transition: all 0.3s ease;
+      animation: fadeInText 0.3s ease-in-out;
+    }
+
+    .scroll-message {
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #3b82f6;
+      background: rgba(59, 130, 246, 0.1);
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      animation: slideInMessage 0.4s ease-out;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 400px;
+    }
+  }
+
+  // Mobile menu toggle button
+  .mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    z-index: 1001;
+    position: relative;
+
+    .hamburger-line {
+      width: 25px;
+      height: 3px;
+      background: #ffffff;
+      margin: 3px 0;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+
+      &.active {
+        &:nth-child(1) {
+          transform: rotate(45deg) translate(6px, 6px);
+        }
+        &:nth-child(2) {
+          opacity: 0;
+        }
+        &:nth-child(3) {
+          transform: rotate(-45deg) translate(6px, -6px);
+        }
+      }
+    }
+
+    &:hover .hamburger-line {
+      background: #2196f3;
     }
   }
 
@@ -84,6 +180,112 @@ nav {
     }
   }
 
+  // Mobile overlay
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+
+    &.active {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+
+  // Responsive design for tablets and mobile
+  @media (max-width: 768px) {
+    padding: 12px 20px;
+
+    .navbar-brand {
+      font-size: 20px;
+
+      .scroll-message {
+        font-size: 12px;
+        padding: 6px 12px;
+        max-width: 280px;
+      }
+    }
+
+    // Show mobile menu toggle
+    .mobile-menu-toggle {
+      display: flex;
+    }
+
+    // Show mobile overlay
+    .mobile-overlay {
+      display: block;
+    }
+
+    // Mobile navigation links
+    .navbar-links {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 280px;
+      height: 100vh;
+      background: #111;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      padding: 80px 30px 30px;
+      transition: right 0.3s ease;
+      z-index: 1000;
+      box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+
+      &.mobile-open {
+        right: 0;
+      }
+
+      a {
+        margin: 0;
+        padding: 15px 0;
+        width: 100%;
+        font-size: 16px;
+        border-bottom: 1px solid #333;
+        
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &::after {
+          bottom: 14px;
+        }
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 10px 15px;
+
+    .navbar-brand {
+      font-size: 18px;
+
+      .scroll-message {
+        font-size: 10px;
+        padding: 4px 8px;
+        max-width: 220px;
+      }
+    }
+
+    .navbar-links {
+      width: 250px;
+      padding: 70px 20px 20px;
+
+      a {
+        font-size: 15px;
+        padding: 12px 0;
+      }
+    }
+  }
+
   // Icon pulse animation for active state
   @keyframes pulse-icon {
     0%, 100% {
@@ -91,35 +293,6 @@ nav {
     }
     50% {
       transform: scale(1.3);
-    }
-  }
-
-  // Responsive design
-  @media (max-width: 768px) {
-    width: 200px;
-    padding: 20px 15px;
-    
-    .navbar-brand {
-      font-size: 20px;
-      margin-bottom: 30px;
-    }
-    
-    .navbar-links {
-      gap: 15px;
-    }
-    
-    .navbar-links a {
-      padding: 12px 15px;
-      font-size: 13px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    width: 180px;
-    
-    .navbar-links a {
-      padding: 10px 12px;
-      font-size: 12px;
     }
   }
 }
@@ -134,8 +307,8 @@ nav {
 // Main content area
 .main-content {
   flex: 1;
-  padding-top: 5px; // Space for fixed navbar
-  min-height: calc(100vh - 70px - 60px); // Full height minus navbar and footer
+  padding-top: 70px; // Space for fixed navbar
+  min-height: calc(100vh - 70px); // Full height minus navbar
   
   // Remove any extra spacing from all components
   > * {
@@ -157,6 +330,17 @@ nav {
       padding-top: 0 !important;
     }
   }
+
+  // Mobile responsive padding
+  @media (max-width: 768px) {
+    padding-top: 60px; // Smaller padding for mobile navbar
+    min-height: calc(100vh - 60px);
+  }
+
+  @media (max-width: 480px) {
+    padding-top: 55px; // Even smaller for very small screens
+    min-height: calc(100vh - 55px);
+  }
 }
 
 // Ensure body takes full height and remove default spacing
@@ -168,11 +352,71 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  
+  // Prevent scrolling when mobile menu is open
+  &.mobile-menu-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
 }
 
 html {
   margin: 0;
   padding: 0;
+  scroll-behavior: smooth;
+}
+
+// Remove any unwanted spacing from the app root
+.app-container {
+  margin: 0;
+  padding: 0;
+  
+  // Force remove any top spacing from first elements
+  > * {
+    margin-top: 0 !important;
+  }
+  
+  // Ensure main content starts immediately after navbar
+  .main-content {
+    margin-top: 0 !important;
+    
+    // Force all child components to start without top spacing
+    > * {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+      
+      // Target the first child of each component
+      > *:first-child {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+      }
+    }
+  }
+}
+
+// Text fade animation for navbar brand
+@keyframes fadeInText {
+  0% {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Scroll message slide in animation
+@keyframes slideInMessage {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
 }
 
 // Fade in animation

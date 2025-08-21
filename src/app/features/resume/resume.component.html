@@ -1,16 +1,6 @@
 <div class="resume-container">
   <!-- Scroll to About Section (at top) -->
-  <section class="scroll-to-about" *ngIf="allowNavigation">
-    <div class="container">
-      <div class="scroll-content animate-on-scroll">
-        <h3>Want to know more about me?</h3>
-        <p>Scroll up to navigate back to the About page</p>
-        <div class="scroll-indicator">
-          <i class="fas fa-arrow-up"></i>
-        </div>
-      </div>
-    </div>
-  </section>
+
 
   <!-- Professional Summary Section -->
   <section class="professional-summary">
@@ -205,18 +195,6 @@
     </div>
   </section>
 
-  <!-- Scroll to Portfolio Section (at bottom) -->
-  <section class="scroll-to-portfolio" *ngIf="allowNavigation">
-    <div class="container">
-      <div class="scroll-content animate-on-scroll">
-        <h3>Ready to see my work?</h3>
-        <p>Scroll down to navigate to my Portfolio</p>
-        <div class="scroll-indicator">
-          <i class="fas fa-arrow-down"></i>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Certificate Image Modal -->
   <div class="certificate-modal" [class.show]="showModal" (click)="closeCertificateImage()">

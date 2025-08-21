@@ -1,13 +1,27 @@
 <div class="app-container">
-  <!-- Horizontal Navbar -->
-  <nav>
-    <div class="navbar-brand" routerLink="/about" (click)="onNavbarClick()">Dinh Pham</div>
-    <div class="navbar-links">
+  <!-- Responsive Navbar -->
+  <nav [class.mobile-menu-open]="isMobileMenuOpen">
+    <div class="navbar-brand" routerLink="/about" (click)="onNavbarClick()">
+      <span class="brand-name">{{ isScrolled ? currentPageTitle : 'Dinh Pham' }}</span>
+    </div>
+    
+    <!-- Mobile Menu Toggle Button -->
+    <button class="mobile-menu-toggle" (click)="toggleMobileMenu()" [attr.aria-label]="isMobileMenuOpen ? 'Close menu' : 'Open menu'">
+      <span class="hamburger-line" [class.active]="isMobileMenuOpen"></span>
+      <span class="hamburger-line" [class.active]="isMobileMenuOpen"></span>
+      <span class="hamburger-line" [class.active]="isMobileMenuOpen"></span>
+    </button>
+    
+    <!-- Navigation Links -->
+    <div class="navbar-links" [class.mobile-open]="isMobileMenuOpen">
       <a routerLink="/about" routerLinkActive="active" (click)="onNavbarClick()">About</a>
       <a routerLink="/resume" routerLinkActive="active" (click)="onNavbarClick()">Resume</a>
       <a routerLink="/portfolio" routerLinkActive="active" (click)="onNavbarClick()">Portfolio</a>
       <a routerLink="/contact" routerLinkActive="active" (click)="onNavbarClick()">Contact</a>
     </div>
+    
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-overlay" [class.active]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
   </nav>
   
   <!-- Main Content -->

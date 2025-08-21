@@ -9,11 +9,11 @@
                     <span [innerHTML]="displayedText"></span>
                 </h1>
                 <p class="animate-on-scroll slide-right delay-2" style="font-size: 1.2rem; color: #ccc; max-width: 500px; margin: 24px 0 32px 0;">
-                    A Ho Chi Minh City based software engineering student passionate about building real-world applications, mastering Java/OOP, and collaborating in Agile teams to create user-friendly solutions.
+                    <span>{{ displayedParagraph }}</span><span class="paragraph-cursor" [class.visible]="!paragraphTypingComplete && displayedParagraph.length > 0">|</span>
                 </p>
                 <div class="d-flex flex-wrap gap-3 justify-content-md-start justify-content-center animate-on-scroll delay-3">
                     <a href="mailto:pdinh460@gmail.com" class="btn">CONTACT</a>
-                    <a href="/assets/certificates/cv.pdf" target="_blank" class="btn">RESUME</a>
+                    <a href="/assets/certificates/cv.pdf" target="_blank" class="btn btn-secondary">RESUME</a>
                 </div>
             </div>
         </div>
@@ -25,13 +25,3 @@
     <p>&copy; {{ currentYear }} Copyright Dinh Pham. All rights reserved.</p>
 </div>
 
-<!-- Scroll section -->
-<div class="scroll-section">
-    <div class="scroll-content">
-        <h2>Scroll down to view {{ nextPageName }}</h2>
-        <p>Continue scrolling to automatically switch to the {{ nextPageName }} page</p>
-        <div class="scroll-arrow">
-            <i class="fas fa-arrow-down"></i>
-        </div>
-    </div>
-</div>

@@ -12,13 +12,19 @@ import { filter } from 'rxjs/operators';
   styleUrl: './contact.component.scss'
 })
 export class ContactComponent implements OnInit, OnDestroy {
-  private scrollThreshold = 100; // Scroll threshold
   private hasNavigated = false;
   private isBrowser: boolean;
   private allowScrollNavigation = false;
   private lastScrollTop = 0;
   allowNavigation = true;
   currentYear = new Date().getFullYear();
+  private config: any;
+
+  // Typewriter effect properties
+  typewriterText: string = "LET'S GET<br>IN TOUCH.";
+  displayedText: string = '';
+  private typewriterIndex = 0;
+  private typewriterTimeout: any;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -29,13 +35,14 @@ export class ContactComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.config = this.navigationService.getNavigationConfig();
     this.hasNavigated = false;
     this.allowScrollNavigation = false;
     
-    // Allow scroll navigation after 2 seconds to prevent immediate loop
+    // Allow scroll navigation after configured delay to prevent immediate loop
     setTimeout(() => {
       this.allowScrollNavigation = true;
-    }, 2000);
+    }, this.config.navigationDelay);
 
     // Listen to route changes to reset navigation state
     if (this.isBrowser) {
@@ -48,51 +55,73 @@ export class ContactComponent implements OnInit, OnDestroy {
           this.allowScrollNavigation = false;
           this.lastScrollTop = 0;
           
-          // Longer delay if coming from portfolio to prevent loop
+          // Use consistent delay to prevent loop
           setTimeout(() => {
             this.allowScrollNavigation = true;
-          }, 3000);
+          }, this.config.navigationDelay);
+          
+          // Restart typewriter effect
+          this.startTypewriter();
         }
       });
     }
 
-    // Initialize scroll animations
+    // Initialize scroll animations and typewriter
     if (this.isBrowser) {
       this.initScrollAnimations();
+      this.startTypewriter();
     }
   }
 
   ngOnDestroy(): void {
     this.hasNavigated = false;
+    if (this.typewriterTimeout) {
+      clearTimeout(this.typewriterTimeout);
+    }
+  }
+
+  private startTypewriter() {
+    this.displayedText = '';
+    this.typewriterIndex = 0;
+    // Clear any existing timeout
+    if (this.typewriterTimeout) {
+      clearTimeout(this.typewriterTimeout);
+    }
+    this.typeChar();
+  }
+  
+  private typeChar() {
+    if (this.typewriterIndex <= this.typewriterText.length) {
+      this.displayedText = this.typewriterText.slice(0, this.typewriterIndex);
+      this.typewriterIndex++;
+      this.typewriterTimeout = setTimeout(() => this.typeChar(), 50);
+    }
   }
 
   @HostListener('window:scroll', ['$event'])
   onWindowScroll() {
-    if (!this.isBrowser || this.hasNavigated || !this.allowScrollNavigation) return;
-    
-    // Check if scroll navigation is enabled
-    if (!this.navigationService.isScrollNavigationEnabled()) return;
+    if (!this.isBrowser) return;
     
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const documentHeight = document.documentElement.scrollHeight;
-    const windowHeight = window.innerHeight;
-    const distanceFromBottom = documentHeight - (scrollTop + windowHeight);
     
     // Debug logging
     console.log('Contact scroll:', {
       scrollTop,
       lastScrollTop: this.lastScrollTop,
-      threshold: this.scrollThreshold,
+      threshold: this.config.scrollThreshold,
       allowNavigation: this.allowScrollNavigation,
       hasNavigated: this.hasNavigated,
-      distanceFromBottom,
-      scrollDirection: scrollTop > this.lastScrollTop ? 'down' : 'up',
-      upCondition: scrollTop <= this.scrollThreshold && scrollTop < this.lastScrollTop && this.lastScrollTop > 400,
-      downCondition: distanceFromBottom <= this.scrollThreshold && scrollTop > this.lastScrollTop
+      scrollDirection: scrollTop > this.lastScrollTop ? 'down' : 'up'
     });
     
-    // Navigate to portfolio when scrolling up from top (with higher threshold to prevent loop)
-    if (scrollTop <= this.scrollThreshold && scrollTop < this.lastScrollTop && this.lastScrollTop > 500) {
+    // Navigate to portfolio when scrolling up from top
+    if (this.navigationService.shouldNavigate(
+      scrollTop, 
+      this.lastScrollTop, 
+      this.allowScrollNavigation, 
+      this.hasNavigated, 
+      true
+    )) {
       console.log('Navigating to portfolio from contact');
       this.hasNavigated = true;
       this.router.navigate(['/portfolio']).then(() => {
