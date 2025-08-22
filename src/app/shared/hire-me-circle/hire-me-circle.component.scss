@@ -66,7 +66,17 @@
       .circular-svg {
         width: 100%;
         height: 100%;
-        animation: rotateCircle 10s linear infinite;
+        
+        &.outer-circle {
+          animation: rotateCircleOuter 12s linear infinite;
+        }
+        
+        &.inner-circle {
+          animation: rotateCircleInner 8s linear infinite reverse;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
         
         .curved-text {
           fill: white;
@@ -79,6 +89,14 @@
           
           &.rotating-text {
             animation: textGlow 2s ease-in-out infinite alternate;
+          }
+          
+          &.inner-text {
+            font-size: 6px;
+            letter-spacing: 2px;
+            fill: rgba(255, 255, 255, 0.8);
+            filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.6));
+            animation: textGlowInner 3s ease-in-out infinite alternate;
           }
         }
       }
@@ -249,12 +267,21 @@
   }
 }
 
-@keyframes rotateCircle {
+@keyframes rotateCircleOuter {
   from {
     transform: rotate(0deg);
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes rotateCircleInner {
+  from {
+    transform: rotate(0deg) scale(0.85);
+  }
+  to {
+    transform: rotate(360deg) scale(0.85);
   }
 }
 
@@ -264,6 +291,17 @@
   }
   100% {
     filter: drop-shadow(0 0 8px rgba(59, 130, 246, 1)) drop-shadow(0 0 12px rgba(37, 99, 235, 0.8));
+  }
+}
+
+@keyframes textGlowInner {
+  0% {
+    filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.6));
+    opacity: 0.7;
+  }
+  100% {
+    filter: drop-shadow(0 0 6px rgba(147, 197, 253, 1)) drop-shadow(0 0 10px rgba(59, 130, 246, 0.8));
+    opacity: 1;
   }
 }
 
@@ -319,6 +357,11 @@
           .curved-text {
             font-size: 6px;
             letter-spacing: 2px;
+            
+            &.inner-text {
+              font-size: 4px;
+              letter-spacing: 1.5px;
+            }
           }
         }
       }
@@ -372,6 +415,11 @@
           .curved-text {
             font-size: 5px;
             letter-spacing: 1.5px;
+            
+            &.inner-text {
+              font-size: 3px;
+              letter-spacing: 1px;
+            }
           }
         }
       }
